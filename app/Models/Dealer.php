@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dealer extends Model
@@ -15,7 +15,6 @@ class Dealer extends Model
         'country',
         'cars_count',
         'employees_count',
-        'manufacture_id',
     ];
 
     protected $appends = [
@@ -27,9 +26,9 @@ class Dealer extends Model
         return $this->city;
     }
 
-    public function manufacture(): BelongsTo
+    public function manufactures(): BelongsToMany
     {
-        return $this->belongsTo(Manufacture::class);
+        return $this->belongsToMany(Manufacture::class)->withTimestamps();
     }
 
     public function cars(): HasMany

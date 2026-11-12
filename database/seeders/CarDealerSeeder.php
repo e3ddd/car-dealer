@@ -30,13 +30,18 @@ class CarDealerSeeder extends Seeder
         );
 
         $dealers = collect(range(1, 5))->map(function () use ($manufactures): Dealer {
-            return Dealer::query()->create([
+            $dealer = Dealer::query()->create([
                 'city' => fake()->city(),
                 'country' => fake()->countryCode(),
-                'manufacture_id' => $manufactures->random()->id,
                 'employees_count' => fake()->numberBetween(5, 80),
                 'cars_count' => 0,
             ]);
+
+            $dealer->manufactures()->sync(
+                $manufactures->random(fake()->numberBetween(1, 3))->pluck('id')->all(),
+            );
+
+            return $dealer;
         });
 
         $carsToCreate = fake()->numberBetween(1, 10);

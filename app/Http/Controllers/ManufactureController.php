@@ -8,7 +8,6 @@ use App\Http\Requests\UpdateManufactureRequest;
 use App\Repositories\ManufactureRepository;
 use App\Services\ManufactureService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ManufactureController extends Controller
 {
@@ -30,7 +29,7 @@ class ManufactureController extends Controller
 
         $newManufacture = $this->manufactureService->create($data['name']);
 
-        return response()->json($newManufacture);
+        return response()->json($newManufacture->loadCount('dealers'));
     }
 
     public function update(UpdateManufactureRequest $request)
@@ -47,19 +46,5 @@ class ManufactureController extends Controller
         $this->manufactureRepository->delete($request->manufacture_id);
 
         return response()->json(['message' => 'Manufacture deleted successfully']);
-    }
-
-    public function search(Request $request): JsonResponse
-    {
-        $term = $request->string('term')->toString();
-
-        return response()->json($this->manufactureService->search($term));
-    }
-
-    public function filter(Request $request): JsonResponse
-    {
-        return response()->json($this->manufactureService->filter(
-            $request->only(['id', 'name']),
-        ));
     }
 }

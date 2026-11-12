@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\CRUDInterface;
 use App\Models\Dealer;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class DealerRepository implements CRUDInterface
@@ -17,7 +18,35 @@ class DealerRepository implements CRUDInterface
 
     public function index(): Collection
     {
-        return $this->dealer->with('manufacture')->get();
+        return $this->dealer->with('manufactures')->get();
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     */
+    public function filter(array $filters): Collection
+    {
+        $query = $this->dealer->newQuery()->with(['manufactures']);
+
+        foreach (['id', 'city', 'country', 'cars_count', 'employees_count'] as $field) {
+            $value = $filters[$field] ?? null;
+
+            if ($value === null || $value === '') {
+                continue;
+            }
+
+            $query->where($field, $value);
+        }
+
+        $manufactureId = $filters['manufacture_id'] ?? null;
+
+        if ($manufactureId !== null && $manufactureId !== '') {
+            $query->whereHas('manufactures', function (Builder $builder) use ($manufactureId): void {
+                $builder->where('manufactures.id', $manufactureId);
+            });
+        }
+
+        return $query->get();
     }
 
     public function create(array $data): Dealer

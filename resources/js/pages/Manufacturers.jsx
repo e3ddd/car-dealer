@@ -4,6 +4,7 @@ import ResourceTable from '../components/ResourceTable';
 
 const manufacturerColumns = [
     { key: 'name', label: 'Name' },
+    { key: 'dealers_count', label: 'Dealers' },
 ];
 
 const manufacturerFields = [
@@ -14,31 +15,12 @@ function mapManufacture(manufacture) {
     return {
         id: manufacture.id,
         name: manufacture.name ?? '',
+        dealers_count: manufacture.dealers_count ?? manufacture.dealers?.length ?? 0,
     };
-}
-
-function cleanFilters(filters) {
-    return Object.fromEntries(
-        Object.entries(filters).filter(([, value]) => value !== '' && value !== null && value !== undefined),
-    );
 }
 
 async function listManufactures() {
     const response = await api.get('/manufacture');
-    const manufactures = Array.isArray(response.data) ? response.data : [];
-
-    return manufactures.map(mapManufacture);
-}
-
-async function searchManufactures(term) {
-    const response = await api.get('/manufacture/search', { params: { term } });
-    const manufactures = Array.isArray(response.data) ? response.data : [];
-
-    return manufactures.map(mapManufacture);
-}
-
-async function filterManufactures(filters) {
-    const response = await api.get('/manufacture/filter', { params: cleanFilters(filters) });
     const manufactures = Array.isArray(response.data) ? response.data : [];
 
     return manufactures.map(mapManufacture);
@@ -49,7 +31,10 @@ async function createManufacture(values) {
         name: values.name,
     });
 
-    return mapManufacture(response.data);
+    return mapManufacture({
+        ...response.data,
+        dealers_count: response.data.dealers_count ?? 0,
+    });
 }
 
 async function updateManufacture(values) {
@@ -73,8 +58,6 @@ async function deleteManufacture(row) {
 
 const manufacturerActions = {
     list: listManufactures,
-    search: searchManufactures,
-    filter: filterManufactures,
     create: createManufacture,
     update: updateManufacture,
     delete: deleteManufacture,
@@ -107,7 +90,6 @@ export default function Manufacturers() {
             title="All manufacturers"
             columns={manufacturerColumns}
             fields={manufacturerFields}
-            filterFields={manufacturerFields}
             initialRows={rows}
             actions={manufacturerActions}
         />

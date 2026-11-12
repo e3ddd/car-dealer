@@ -23,10 +23,11 @@ class CreateDealerRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'city' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-            'manufacture_id' => 'required|exists:manufactures,id',
-            'employees_count' => 'sometimes|integer|min:0',
+            'city' => ['required', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:255'],
+            'manufacture_ids' => ['required', 'array', 'min:1'],
+            'manufacture_ids.*' => ['integer', 'exists:manufactures,id'],
+            'employees_count' => ['sometimes', 'integer', 'min:0'],
         ];
     }
 }

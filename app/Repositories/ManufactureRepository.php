@@ -12,7 +12,7 @@ class ManufactureRepository implements CRUDInterface
 
     public function index(): Collection
     {
-        return $this->manufacture->all();
+        return $this->manufacture->withCount('dealers')->get();
     }
 
     public function create(array $data): Manufacture

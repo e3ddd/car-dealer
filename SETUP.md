@@ -118,9 +118,9 @@ php artisan serve
 ## 6. Полезные API
 
 - `GET /car`, `POST /car`, `PUT /car`, `DELETE /car`
-- `GET /car/search?term=...`, `GET /car/filter?...`
-- `GET /dealer`, `GET /dealer/search?term=...`
-- `GET /manufacture`, `GET /manufacture/search?term=...`
+- `GET /car/filter?...` (size, color, fuel, dealer_id, manufacture_id)
+- `GET /dealer`, `GET /dealer/filter?...`
+- `GET /manufacture`
 
 ## Быстрый чеклист
 

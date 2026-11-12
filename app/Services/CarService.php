@@ -2,15 +2,9 @@
 
 namespace App\Services;
 
-use App\CarColorsEnum;
-use App\CarFuelTypesEnum;
-use App\CarSizesEnum;
 use App\Models\Car;
 use App\Repositories\CarRepository;
 use App\Repositories\DealerRepository;
-use App\TableToolsClass;
-use BackedEnum;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class CarService
@@ -45,41 +39,11 @@ class CarService
         $this->dealerRepository->decrementCarsCounter($dealer);
     }
 
-    public function search(string $term): Collection
-    {
-        return $this->tableTools()->search($term, function (Builder $builder, string $searchTerm): void {
-            $this->applyEnumSearch($builder, 'size', CarSizesEnum::cases(), $searchTerm);
-            $this->applyEnumSearch($builder, 'color', CarColorsEnum::cases(), $searchTerm);
-            $this->applyEnumSearch($builder, 'fuel', CarFuelTypesEnum::cases(), $searchTerm);
-        });
-    }
-
+    /**
+     * @param  array<string, mixed>  $filters
+     */
     public function filter(array $filters): Collection
     {
-        return $this->tableTools()->filter($filters);
-    }
-
-    private function applyEnumSearch(Builder $builder, string $column, array $cases, string $term): void
-    {
-        foreach ($cases as $case) {
-            if (! str_contains(strtolower($case->name), strtolower($term))) {
-                continue;
-            }
-
-            $builder->orWhere($column, $case->value);
-        }
-    }
-
-    private function tableTools(): TableToolsClass
-    {
-        return new TableToolsClass(
-            new Car,
-            ['id', 'size', 'color', 'fuel', 'dealer_id'],
-            ['dealer.manufacture'],
-            [
-                'dealer' => ['city', 'country'],
-                'dealer.manufacture' => ['name'],
-            ],
-        );
+        return $this->carRepository->filter($filters);
     }
 }

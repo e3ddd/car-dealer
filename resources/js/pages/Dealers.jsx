@@ -5,38 +5,42 @@ import ResourceTable from '../components/ResourceTable';
 const dealerColumns = [
     { key: 'city', label: 'City' },
     { key: 'country', label: 'Country' },
-    { key: 'manufacture', label: 'Manufacture' },
+    { key: 'manufacture', label: 'Manufacturers' },
     { key: 'cars_count', label: 'Cars' },
     { key: 'employees_count', label: 'Employees' },
 ];
 
+function manufactureLabels(manufactureIds, manufactureOptions) {
+    return manufactureIds
+        .map((id) => manufactureOptions.find((option) => String(option.value) === String(id))?.label ?? `#${id}`)
+        .join(', ');
+}
+
 function mapDealer(dealer, manufactureOptions = []) {
-    const manufactureOption = manufactureOptions.find(
-        (option) => String(option.value) === String(dealer.manufacture_id),
-    );
+    const manufactureIds = Array.isArray(dealer.manufactures)
+        ? dealer.manufactures.map((manufacture) => String(manufacture.id))
+        : (dealer.manufacture_ids ?? []).map(String);
 
     return {
         id: dealer.id,
         city: dealer.city ?? '',
         country: dealer.country ?? '',
-        manufacture_id: String(dealer.manufacture_id ?? ''),
-        manufacture: dealer.manufacture?.name ?? manufactureOption?.label ?? `#${dealer.manufacture_id}`,
+        manufacture_ids: manufactureIds,
+        manufacture: manufactureLabels(manufactureIds, manufactureOptions) || '—',
         cars_count: dealer.cars_count ?? 0,
         employees_count: dealer.employees_count ?? 0,
     };
 }
 
 function mapFormDealer(values, manufactureOptions = []) {
-    const manufactureOption = manufactureOptions.find(
-        (option) => String(option.value) === String(values.manufacture_id),
-    );
+    const manufactureIds = (values.manufacture_ids ?? []).map(String);
 
     return {
         id: values.id,
         city: values.city ?? '',
         country: values.country ?? '',
-        manufacture_id: String(values.manufacture_id ?? ''),
-        manufacture: manufactureOption?.label ?? values.manufacture ?? `#${values.manufacture_id}`,
+        manufacture_ids: manufactureIds,
+        manufacture: manufactureLabels(manufactureIds, manufactureOptions) || values.manufacture || '—',
         cars_count: values.cars_count ?? 0,
         employees_count: Number(values.employees_count || 0),
     };
@@ -44,7 +48,13 @@ function mapFormDealer(values, manufactureOptions = []) {
 
 function cleanFilters(filters) {
     return Object.fromEntries(
-        Object.entries(filters).filter(([, value]) => value !== '' && value !== null && value !== undefined),
+        Object.entries(filters).filter(([, value]) => {
+            if (Array.isArray(value)) {
+                return value.length > 0;
+            }
+
+            return value !== '' && value !== null && value !== undefined;
+        }),
     );
 }
 
@@ -59,20 +69,27 @@ function buildDealerFields(manufactureOptions) {
     return [
         { name: 'city', label: 'City' },
         { name: 'country', label: 'Country' },
-        { name: 'manufacture_id', label: 'Manufacture', options: manufactureOptions },
+        {
+            name: 'manufacture_ids',
+            label: 'Manufacturers',
+            options: manufactureOptions,
+            multiple: true,
+        },
+        { name: 'employees_count', label: 'Employees' },
+    ];
+}
+
+function buildDealerFilterFields(manufactureOptions) {
+    return [
+        { name: 'city', label: 'City' },
+        { name: 'country', label: 'Country' },
+        { name: 'manufacture_id', label: 'Manufacturer', options: manufactureOptions },
         { name: 'employees_count', label: 'Employees' },
     ];
 }
 
 async function listDealers(manufactureOptions) {
     const response = await api.get('/dealer');
-    const dealers = Array.isArray(response.data) ? response.data : [];
-
-    return dealers.map((dealer) => mapDealer(dealer, manufactureOptions));
-}
-
-async function searchDealers(term, manufactureOptions) {
-    const response = await api.get('/dealer/search', { params: { term } });
     const dealers = Array.isArray(response.data) ? response.data : [];
 
     return dealers.map((dealer) => mapDealer(dealer, manufactureOptions));
@@ -89,7 +106,7 @@ async function createDealer(values, manufactureOptions) {
     const response = await api.post('/dealer', {
         city: values.city,
         country: values.country,
-        manufacture_id: Number(values.manufacture_id),
+        manufacture_ids: (values.manufacture_ids ?? []).map(Number),
         employees_count: Number(values.employees_count || 0),
     });
 
@@ -102,7 +119,7 @@ async function updateDealer(values, manufactureOptions) {
         data: {
             city: values.city,
             country: values.country,
-            manufacture_id: Number(values.manufacture_id),
+            manufacture_ids: (values.manufacture_ids ?? []).map(Number),
             employees_count: Number(values.employees_count || 0),
         },
     });
@@ -121,7 +138,6 @@ async function deleteDealer(row) {
 function createDealerActions(manufactureOptions) {
     return {
         list: () => listDealers(manufactureOptions),
-        search: (term) => searchDealers(term, manufactureOptions),
         filter: (filters) => filterDealers(filters, manufactureOptions),
         create: (values) => createDealer(values, manufactureOptions),
         update: (values) => updateDealer(values, manufactureOptions),
@@ -151,7 +167,7 @@ export default function Dealers() {
                 setManufactureOptions(nextManufactureOptions);
                 setRows(dealers.map((dealer) => mapDealer(dealer, nextManufactureOptions)));
                 setFields(nextFields);
-                setFilterFields(nextFields);
+                setFilterFields(buildDealerFilterFields(nextManufactureOptions));
                 setReady(true);
             })
             .catch(() => setError('Could not load dealers'));
@@ -175,6 +191,7 @@ export default function Dealers() {
             filterFields={filterFields}
             initialRows={rows}
             actions={actions}
+            liveFilter
         />
     );
 }

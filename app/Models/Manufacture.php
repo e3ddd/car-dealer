@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Manufacture extends Model
 {
@@ -13,8 +13,8 @@ class Manufacture extends Model
         'name',
     ];
 
-    public function dealers(): HasMany
+    public function dealers(): BelongsToMany
     {
-        return $this->hasMany(Dealer::class);
+        return $this->belongsToMany(Dealer::class)->withTimestamps();
     }
 }

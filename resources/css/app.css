@@ -380,6 +380,29 @@ input {
     box-shadow: 0 0 0 4px var(--accent-soft);
 }
 
+.selected-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.selected-value {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 0.35rem 0.55rem;
+    font-size: 0.8125rem;
+    cursor: pointer;
+}
+
+.selected-value:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
 .page-stack {
     display: grid;
     gap: 1.5rem;

@@ -33,18 +33,18 @@ class DealerController extends Controller
         $newDealer = $this->dealerService->create(
             $data['city'],
             $data['country'],
-            $data['manufacture_id'],
+            $data['manufacture_ids'],
             $data['employees_count'] ?? 0,
         );
 
-        return response()->json($newDealer->load('manufacture'));
+        return response()->json($newDealer);
     }
 
     public function update(UpdateDealerRequest $request)
     {
         $data = $request->validated();
 
-        $this->dealerRepository->update($data['dealer_id'], $data['data']);
+        $this->dealerService->update($data['dealer_id'], $data['data']);
 
         return response()->json(['message' => 'Dealer updated successfully']);
     }
@@ -54,13 +54,6 @@ class DealerController extends Controller
         $this->dealerRepository->delete($request->dealer_id);
 
         return response()->json(['message' => 'Dealer deleted successfully']);
-    }
-
-    public function search(Request $request): JsonResponse
-    {
-        $term = $request->string('term')->toString();
-
-        return response()->json($this->dealerService->search($term));
     }
 
     public function filter(Request $request): JsonResponse

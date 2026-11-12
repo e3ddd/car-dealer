@@ -30,7 +30,7 @@ class CarController extends Controller
 
         $newCar = $this->carService->create($data['dealer_id'], $data['size'], $data['color'], $data['fuel']);
 
-        return response()->json($newCar->load('dealer.manufacture'));
+        return response()->json($newCar->load('dealer.manufactures'));
     }
 
     public function update(UpdateCarRequest $request)
@@ -49,17 +49,10 @@ class CarController extends Controller
         return response()->json(['message' => 'Car deleted successfully']);
     }
 
-    public function search(Request $request): JsonResponse
-    {
-        $term = $request->string('term')->toString();
-
-        return response()->json($this->carService->search($term));
-    }
-
     public function filter(Request $request): JsonResponse
     {
         return response()->json($this->carService->filter(
-            $request->only(['id', 'size', 'color', 'fuel', 'dealer_id']),
+            $request->only(['id', 'size', 'color', 'fuel', 'dealer_id', 'manufacture_id']),
         ));
     }
 
