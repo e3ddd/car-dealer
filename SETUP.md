@@ -1,49 +1,49 @@
-# Как запустить проект
+# How to run the project
 
-Car Dealer — Laravel 13 + React (Vite). Backend отдаёт JSON API, фронтенд рендерится через `resources/js`.
+Car Dealer — Laravel 13 + React (Vite). The backend serves a JSON API; the frontend is rendered from `resources/js`.
 
-## Требования
+## Requirements
 
 - PHP **8.3+**
 - Composer
-- Node.js **18+** и npm
-- MySQL **или** SQLite
+- Node.js **18+** and npm
+- MySQL **or** SQLite
 
-## 1. Установка зависимостей
+## 1. Install dependencies
 
-Из корня проекта:
+From the project root:
 
 ```bash
 composer install
 npm install
 ```
 
-## 2. Окружение
+## 2. Environment
 
 ```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-### Вариант A: SQLite (быстрый старт)
+### Option A: SQLite (quick start)
 
-В `.env`:
+In `.env`:
 
 ```env
 DB_CONNECTION=sqlite
 ```
 
-Создайте файл БД:
+Create the database file:
 
 ```bash
 touch database/database.sqlite
 ```
 
-Строки `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` можно закомментировать.
+You can comment out `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, and `DB_PASSWORD`.
 
-### Вариант B: MySQL
+### Option B: MySQL
 
-В `.env`:
+In `.env`:
 
 ```env
 DB_CONNECTION=mysql
@@ -54,87 +54,87 @@ DB_USERNAME=your_user
 DB_PASSWORD=your_password
 ```
 
-Создайте базу `car_dealer` заранее.
+Create the `car_dealer` database beforehand.
 
-## 3. Миграции и сидер
+## 3. Migrations and seeder
 
 ```bash
 php artisan migrate
 php artisan db:seed --class=CarDealerSeeder
 ```
 
-Сидер создаёт производителей, дилеров и машины (до 10 машин).
+The seeder creates manufacturers, dealers, and cars (up to 10 cars).
 
-Полный сид через `DatabaseSeeder`:
+Full seed via `DatabaseSeeder`:
 
 ```bash
 php artisan db:seed
 ```
 
-## 4. Запуск
+## 4. Run
 
-Нужны **два процесса**: Laravel и Vite.
+You need **two processes**: Laravel and Vite.
 
-### Терминал 1 — backend
+### Terminal 1 — backend
 
 ```bash
 php artisan serve
 ```
 
-Приложение: [http://127.0.0.1:8000](http://127.0.0.1:8000)
+App: [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-### Терминал 2 — frontend (hot reload)
+### Terminal 2 — frontend (hot reload)
 
 ```bash
 npm run dev
 ```
 
-### Или одной командой
+### Or as a single command
 
 ```bash
 composer run dev
 ```
 
-(`php artisan dev` поднимает окружение разработки Laravel.)
+(`php artisan dev` starts the Laravel development environment.)
 
-### Production-сборка фронта
+### Production frontend build
 
-Если Vite не нужен постоянно:
+If you do not need Vite running continuously:
 
 ```bash
 npm run build
 php artisan serve
 ```
 
-## 5. Страницы
+## 5. Pages
 
-| URL | Описание |
-|-----|----------|
-| `/` | Главная |
-| `/cars` | Машины |
-| `/dealers` | Дилеры |
-| `/manufacturers` | Производители |
+| URL | Description |
+|-----|-------------|
+| `/` | Home |
+| `/cars` | Cars |
+| `/dealers` | Dealers |
+| `/manufacturers` | Manufacturers |
 
-## 6. Полезные API
+## 6. Useful API endpoints
 
 - `GET /car`, `POST /car`, `PUT /car`, `DELETE /car`
 - `GET /car/filter?...` (size, color, fuel, dealer_id, manufacture_id)
 - `GET /dealer`, `GET /dealer/filter?...`
 - `GET /manufacture`
 
-## Быстрый чеклист
+## Quick checklist
 
 ```bash
 composer install
 npm install
 cp .env.example .env
 php artisan key:generate
-# настроить DB в .env
+# configure DB in .env
 php artisan migrate
 php artisan db:seed --class=CarDealerSeeder
 php artisan serve
-# в другом терминале:
+# in another terminal:
 npm run dev
 ```
 
-Откройте [http://127.0.0.1:8000](http://127.0.0.1:8000).
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
